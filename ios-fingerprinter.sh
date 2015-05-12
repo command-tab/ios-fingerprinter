@@ -40,14 +40,14 @@ if [ -z "$p12_cert" ]; then
   echo "Error: Could not find a certificate inside $p12. Wrong password?"
   exit 1
 fi
-p12_cert_sha1="`echo "$p12_cert" | openssl x509 -inform pem -fingerprint -sha1 -noout | sed 's/SHA1 Fingerprint=//'`"
-echo "P12 contains a certificate with SHA-1 fingerprint:"
+p12_cert_sha1="`echo "$p12_cert" | openssl x509 -inform pem -fingerprint -sha1 -noout | sed 's/Fingerprint=//'`"
+echo "P12 contains a certificate with fingerprint:"
 echo -e "  ${blue_color}${p12_cert_sha1}${end_color}"
 
 # Count the certs in the provisioning profile
 prov_certs_xpath="/plist/dict/key[. = 'DeveloperCertificates']/following-sibling::array[1]/data"
 prov_plist="`security cms -D -i "$prov"`"
-prov_certs_count="`echo "$prov_plist" | xml sel -t -v "count($prov_certs_xpath)"`"
+prov_certs_count="`echo "$prov_plist" | xml sel -t -v "count($prov_certs_xpath)" 2>/dev/null`"
 echo
 echo "Provisioning profile contains $prov_certs_count developer certificates:"
 
