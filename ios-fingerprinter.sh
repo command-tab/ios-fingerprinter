@@ -40,9 +40,9 @@ if [ -z "$p12_cert" ]; then
   echo "Error: Could not find a certificate inside $p12. Wrong password?"
   exit 1
 fi
-p12_cert_sha1="`echo "$p12_cert" | openssl x509 -inform pem -fingerprint -sha1 -noout | sed 's/Fingerprint=//'`"
+p12_cert_fingerprint="`echo "$p12_cert" | openssl x509 -inform pem -fingerprint -sha1 -noout | sed 's/Fingerprint=//'`"
 echo "P12 contains a certificate with fingerprint:"
-echo -e "  ${blue_color}${p12_cert_sha1}${end_color}"
+echo -e "  ${blue_color}${p12_cert_fingerprint}${end_color}"
 
 # Count the certs in the provisioning profile
 prov_certs_xpath="/plist/dict/key[. = 'DeveloperCertificates']/following-sibling::array[1]/data"
@@ -55,12 +55,12 @@ echo "Provisioning profile contains $prov_certs_count developer certificates:"
 found_match=false
 for (( prov_cert_index = 1; prov_cert_index <= $prov_certs_count; prov_cert_index++ )); do
   prov_cert="`echo "-----BEGIN CERTIFICATE-----" && echo "$prov_plist" | xml sel -t -v "$prov_certs_xpath[$prov_cert_index]" 2>/dev/null | fold -w 64 && echo -e "\n-----END CERTIFICATE-----"`"
-  prov_cert_sha1="`echo "$prov_cert" | openssl x509 -inform pem -fingerprint -sha1 -noout | sed 's/Fingerprint=//'`"
-  if [[ "$prov_cert_sha1" == "$p12_cert_sha1" ]]; then
-    echo -e "  ${blue_color}${prov_cert_sha1}${end_color}"
+  prov_cert_fingerprint="`echo "$prov_cert" | openssl x509 -inform pem -fingerprint -sha1 -noout | sed 's/Fingerprint=//'`"
+  if [[ "$prov_cert_fingerprint" == "$p12_cert_fingerprint" ]]; then
+    echo -e "  ${blue_color}${prov_cert_fingerprint}${end_color}"
     found_match=true
   else
-    echo "  $prov_cert_sha1"
+    echo "  $prov_cert_fingerprint"
   fi
 done
 
