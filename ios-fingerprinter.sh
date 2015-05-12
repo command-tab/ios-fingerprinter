@@ -54,8 +54,8 @@ echo "Provisioning profile contains $prov_certs_count developer certificates:"
 # Loop over the certs in the prov and the compare the SHA-1 fingerprint of the current cert to that of the p12 cert, looking for a match
 found_match=false
 for (( prov_cert_index = 1; prov_cert_index <= $prov_certs_count; prov_cert_index++ )); do
-  prov_cert="`echo "-----BEGIN CERTIFICATE-----" && echo "$prov_plist" | xml sel -t -v "$prov_certs_xpath[$prov_cert_index]" | awk '{print $1}' | tail -n +2 | sed '$d' && echo "-----END CERTIFICATE-----"`"
-  prov_cert_sha1="`echo "$prov_cert" | openssl x509 -inform pem -fingerprint -sha1 -noout | sed 's/SHA1 Fingerprint=//'`"
+  prov_cert="`echo "-----BEGIN CERTIFICATE-----" && echo "$prov_plist" | xml sel -t -v "$prov_certs_xpath[$prov_cert_index]" 2>/dev/null | fold -w 64 && echo -e "\n-----END CERTIFICATE-----"`"
+  prov_cert_sha1="`echo "$prov_cert" | openssl x509 -inform pem -fingerprint -sha1 -noout | sed 's/Fingerprint=//'`"
   if [[ "$prov_cert_sha1" == "$p12_cert_sha1" ]]; then
     echo -e "  ${blue_color}${prov_cert_sha1}${end_color}"
     found_match=true
